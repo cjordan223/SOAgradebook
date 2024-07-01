@@ -1,6 +1,7 @@
 package com.cst438.domain;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class Enrollment {
@@ -8,10 +9,50 @@ public class Enrollment {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="enrollment_id")
     int enrollmentId;
-	
-	// TODO complete this class
-    // add additional attribute for grade
-    // create relationship between enrollment and user entities
-    // create relationship between enrollment and section entities
-    // add getter/setter methods
+
+    @Column(name="grade")
+	private String grade;
+
+    @ManyToOne
+    @JoinColumn(name="studentId", referencedColumnName = "id")
+    User student;
+
+    @ManyToOne
+    @JoinColumn(name = "sectionId", referencedColumnName = "section_no")
+    Section section;
+
+    public int getEnrollmentId() {
+        return enrollmentId;
+    }
+
+    public void setEnrollmentId(int enrollmentId) {
+        this.enrollmentId = enrollmentId;
+    }
+
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
+    }
+
+
+    public Section getSection() {
+        return section;
+    }
+
+    public void setSection(Section section) {
+        this.section = section;
+    }
 }

@@ -1,6 +1,10 @@
 package com.cst438.controller;
 
 
+import com.cst438.domain.Course;
+import com.cst438.domain.Enrollment;
+import com.cst438.domain.EnrollmentRepository;
+import com.cst438.dto.CourseDTO;
 import com.cst438.dto.EnrollmentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +17,8 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class EnrollmentController {
+    @Autowired
+    EnrollmentRepository enrollmentRepository;
 
     // instructor downloads student enrollments for a section, ordered by student name
     // user must be instructor for the section
@@ -20,23 +26,45 @@ public class EnrollmentController {
     public List<EnrollmentDTO> getEnrollments(
             @PathVariable("sectionNo") int sectionNo ) {
 
-        // TODO
-		//  hint: use enrollment repository findEnrollmentsBySectionNoOrderByStudentName method
-        //  remove the following line when done
-        return null;
+        List<Enrollment> enrollments = enrollmentRepository.findEnrollmentsBySectionNoOrderByStudentName(sectionNo);
+        if (enrollments == null) {
+            throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "Section not found "+sectionNo);
+        } else {
+            List<EnrollmentDTO> dto_list = new ArrayList<>();
+            for (Enrollment e : enrollments) {
+                dto_list.add(new EnrollmentDTO(e.getEnrollmentId(),
+                        e.getGrade(),
+                        e.getStudent().getId(),
+                        e.getStudent().getName(),
+                        e.getStudent().getEmail(),
+                        e.getSection().getCourse().getCourseId(),
+                        e.getSection().getCourse().getTitle(),
+                        e.getSection().getSectionNo(),
+                        e.getSection().getSectionNo(),
+                        e.getSection().getBuilding(),
+                        e.getSection().getRoom(),
+                        e.getSection().getTimes(),
+                        e.getSection().getCourse().getCredits(),
+                        e.getSection().getTerm().getYear(),
+                        e.getSection().getTerm().getSemester()
+                ));
+            }
+            return dto_list;
+        }
     }
 
     // instructor uploads enrollments with the final grades for the section
     // user must be instructor for the section
     @PutMapping("/enrollments")
     public void updateEnrollmentGrade(@RequestBody List<EnrollmentDTO> dlist) {
-
-        // TODO
-
-        // For each EnrollmentDTO in the list
-        //  find the Enrollment entity using enrollmentId
-        //  update the grade and save back to database
-
+        if (dlist.size() < 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Please provide the enrollments");
+        } else {
+            for (EnrollmentDTO enrollment : dlist) {
+                Enrollment e = enrollmentRepository.findById(enrollment.enrollmentId()).orElse(null);
+                e.setGrade(enrollment.grade());
+                enrollmentRepository.save(e);
+            }
+        }
     }
-
 }
