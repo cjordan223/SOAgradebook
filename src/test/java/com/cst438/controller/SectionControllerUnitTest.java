@@ -15,10 +15,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*
- * example of unit test to add a section to an existing course
- */
-
 @AutoConfigureMockMvc
 @SpringBootTest
 public class SectionControllerUnitTest {
@@ -42,6 +38,7 @@ public class SectionControllerUnitTest {
                 2024,
                 "Spring",
                 "cst499",
+                "Capstone",
                 1,
                 "052",
                 "104",
@@ -59,8 +56,8 @@ public class SectionControllerUnitTest {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(section)))
-                        .andReturn()
-                        .getResponse();
+                .andReturn()
+                .getResponse();
 
         // check the response code for 200 meaning OK
         assertEquals(200, response.getStatus());
@@ -93,7 +90,7 @@ public class SectionControllerUnitTest {
     }
 
     @Test
-    public void addSectionFailsBadCourse( ) throws Exception {
+    public void addSectionFailsBadCourse() throws Exception {
 
         MockHttpServletResponse response;
 
@@ -103,6 +100,7 @@ public class SectionControllerUnitTest {
                 2024,
                 "Spring",
                 "cst599",
+                "Non-existent course",
                 1,
                 "052",
                 "104",
