@@ -1,9 +1,9 @@
 package com.cst438.domain;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
 
 public interface SectionRepository extends CrudRepository<Section, Integer> {
 	
@@ -18,4 +18,11 @@ public interface SectionRepository extends CrudRepository<Section, Integer> {
     @Query("select s from Section s where current_date between s.term.addDate and s.term.addDeadline " +
             " order by s.course.courseId, s.secId")
     List<Section> findByOpenOrderByCourseIdSectionId();
+
+    @Query("select s from Section s where s.secId=:secId")
+    List<Section> findBySectionId(int secId);
+
+//     @Query("select s from Section s where s.sectionNo=:sectionNo")
+//     Section findBySectionNo(int sectionNo);
+
 }

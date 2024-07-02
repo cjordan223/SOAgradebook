@@ -1,9 +1,9 @@
 package com.cst438.controller;
 
-import com.cst438.domain.Section;
-import com.cst438.domain.SectionRepository;
-import com.cst438.dto.SectionDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,7 +13,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.cst438.domain.Section;
+import com.cst438.domain.SectionRepository;
+import com.cst438.dto.SectionDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -38,7 +41,7 @@ public class SectionControllerUnitTest {
                 2024,
                 "Spring",
                 "cst499",
-                "Capstone",
+                "Computer Science Capstone",
                 1,
                 "052",
                 "104",
