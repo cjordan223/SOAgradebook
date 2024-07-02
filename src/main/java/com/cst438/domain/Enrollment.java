@@ -1,7 +1,12 @@
 package com.cst438.domain;
 
-import jakarta.persistence.*;
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Enrollment {
@@ -14,11 +19,11 @@ public class Enrollment {
 	private String grade;
 
     @ManyToOne
-    @JoinColumn(name="studentId", referencedColumnName = "id")
+    @JoinColumn(name="user_id", referencedColumnName = "id")
     User student;
 
     @ManyToOne
-    @JoinColumn(name = "sectionId", referencedColumnName = "section_no")
+    @JoinColumn(name = "section_no", referencedColumnName = "section_no")
     Section section;
 
     public int getEnrollmentId() {
