@@ -25,9 +25,14 @@ public class AssignmentController {
 
     @Autowired
     AssignmentRepository assignmentRepository;
+    @Autowired
+    EnrollmentRepository enrollmentRepository;
 
     @Autowired
     SectionRepository sectionRepository;
+
+    @Autowired
+    GradeRepository gradeRepository;
 
     @GetMapping("/sections/{secNo}/assignments")
     public List<AssignmentDTO> getAssignments(@PathVariable("secNo") int secNo) {
@@ -126,10 +131,6 @@ public class AssignmentController {
         }
     }
 
-
-    // THIS SECTION WILL NEED GRADE PORTION COMPLETE TO TEST
-
-
     // instructor gets grades for assignment ordered by student name
     // user must be instructor for the section
     @GetMapping("/assignments/{assignmentId}/grades")
@@ -137,54 +138,54 @@ public class AssignmentController {
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "Assignment not found"));
 
-//        List<GradeDTO> gradeDTOs = new ArrayList<>();
-//        List<Enrollment> enrollments = enrollmentRepository.findEnrollmentsBySectionNoOrderByStudentName(assignment.getSection().getSectionNo());
-//        for (Enrollment e : enrollments) {
-//            Grade grade = gradeRepository.findByEnrollmentIdAndAssignmentId(e.getEnrollmentId(), assignment.getAssignmentId());
-//            if (grade == null) {
-//                grade = new Grade();
-//                grade.setAssignment(assignment);
-//                grade.setEnrollment(e);
-//                grade.setScore(null);
-//                grade = gradeRepository.save(grade);
-//            }
-//            gradeDTOs.add(new GradeDTO(grade.getGradeId(), grade.getEnrollment().getStudent().getName(),
-//                    grade.getEnrollment().getStudent().getEmail(), grade.getAssignment().getTitle(),
-//                    grade.getAssignment().getSection().getCourse().getCourseId(), grade.getAssignment().getSection().getSecId(), grade.getScore()));
-//        }
+        List<GradeDTO> gradeDTOs = new ArrayList<>();
+        List<Enrollment> enrollments = enrollmentRepository.findEnrollmentsBySectionNoOrderByStudentName(assignment.getSection().getSectionNo());
+        for (Enrollment e : enrollments) {
+            Grade grade = gradeRepository.findByEnrollmentIdAndAssignmentId(e.getEnrollmentId(), assignment.getAssignmentId());
+            if (grade == null) {
+                grade = new Grade();
+                grade.setAssignment(assignment);
+                grade.setEnrollment(e);
 
-//        return gradeDTOs;
-        return null;
+                grade.setScore(0);
+                //grade.setScore(null);
+                grade = gradeRepository.save(grade);
+            }
+            gradeDTOs.add(new GradeDTO(grade.getGradeId(), grade.getEnrollment().getStudent().getName(),
+                    grade.getEnrollment().getStudent().getEmail(), grade.getAssignment().getTitle(),
+                    grade.getAssignment().getSection().getCourse().getCourseId(), grade.getAssignment().getSection().getSecId(), grade.getScore()));
+        }
+
+        return gradeDTOs;
     }
 
     @PutMapping("/grades")
     public void updateGrades(@RequestBody List<GradeDTO> dlist) {
-//        for (GradeDTO dto : dlist) {
-//            Grade grade = gradeRepository.findById(dto.gradeId()).orElseThrow(() ->
-//                    new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grade not found"));
-//            grade.setScore(dto.score());
-//            gradeRepository.save(grade);
-//        }
+        for (GradeDTO dto : dlist) {
+            Grade grade = gradeRepository.findById(dto.gradeId()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grade not found"));
+            grade.setScore(dto.score());
+            gradeRepository.save(grade);
+        }
     }
 
     @GetMapping("/assignments")
     public List<AssignmentStudentDTO> getStudentAssignments(@RequestParam("studentId") int studentId,
                                                             @RequestParam("year") int year,
                                                             @RequestParam("semester") String semester) {
-//        List<Assignment> assignments = assignmentRepository.findByStudentIdAndYearAndSemesterOrderByDueDate(studentId, year, semester);
-//        if (assignments.isEmpty()) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No assignments found for the given criteria");
-//        }
-//        List<AssignmentStudentDTO> assignmentStudentDTOs = new ArrayList<>();
-//        for (Assignment a : assignments) {
-//            Grade grade = gradeRepository.findByEnrollmentIdAndAssignmentId(a.getSection().getEnrollments().stream()
-//                    .filter(e -> e.getStudent().getId() == studentId)
-//                    .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollment not found for student")).getEnrollmentId(), a.getAssignmentId());
-//            Integer score = (grade != null) ? grade.getScore() : null;
-//            assignmentStudentDTOs.add(new AssignmentStudentDTO(a.getAssignmentId(), a.getTitle(), a.getDueDate(),
-//                    a.getSection().getCourse().getCourseId(), a.getSection().getSecId(), score));
-//        }
-//        return assignmentStudentDTOs;
-        return null;
+        List<Assignment> assignments = assignmentRepository.findByStudentIdAndYearAndSemesterOrderByDueDate(studentId, year, semester);
+        if (assignments.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No assignments found for the given criteria");
+        }
+        List<AssignmentStudentDTO> assignmentStudentDTOs = new ArrayList<>();
+        for (Assignment a : assignments) {
+            Grade grade = gradeRepository.findByEnrollmentIdAndAssignmentId(a.getSection().getEnrollments().stream()
+                    .filter(e -> e.getStudent().getId() == studentId)
+                    .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollment not found for student")).getEnrollmentId(), a.getAssignmentId());
+            Integer score = (grade != null) ? grade.getScore() : null;
+            assignmentStudentDTOs.add(new AssignmentStudentDTO(a.getAssignmentId(), a.getTitle(), a.getDueDate(),
+                    a.getSection().getCourse().getCourseId(), a.getSection().getSecId(), score));
+        }
+        return assignmentStudentDTOs;
     }
 }
