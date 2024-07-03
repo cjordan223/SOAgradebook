@@ -31,7 +31,7 @@ public class EnrollmentController {
             @PathVariable("sectionNo") int sectionNo ) {
 
         List<Enrollment> enrollments = enrollmentRepository.findEnrollmentsBySectionNoOrderByStudentName(sectionNo);
-        if (enrollments == null) {
+        if (sectionNo < 1) {
             throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "Section not found "+sectionNo);
         } else {
             List<EnrollmentDTO> dto_list = new ArrayList<>();
