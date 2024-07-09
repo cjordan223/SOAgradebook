@@ -1,22 +1,33 @@
 package com.cst438.controller;
 
-import com.cst438.domain.*;
-import com.cst438.dto.AssignmentDTO;
-import com.cst438.dto.AssignmentStudentDTO;
-import com.cst438.dto.GradeDTO;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.cst438.domain.Assignment;
+import com.cst438.domain.AssignmentRepository;
+import com.cst438.domain.Enrollment;
+import com.cst438.domain.EnrollmentRepository;
+import com.cst438.domain.Grade;
+import com.cst438.domain.GradeRepository;
+import com.cst438.domain.Section;
+import com.cst438.domain.SectionRepository;
+import com.cst438.dto.AssignmentDTO;
+import com.cst438.dto.AssignmentStudentDTO;
+import com.cst438.dto.GradeDTO;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -62,7 +73,7 @@ public class AssignmentController {
     @PostMapping("/assignments")
     public AssignmentDTO createAssignment(@RequestBody AssignmentDTO dto) {
         // check if section exists
-        Section section = sectionRepository.findById(dto.secId()).orElseThrow(() ->
+        Section section = sectionRepository.findById(dto.secNo()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "Section not found"));
 
         // check if due date is within course start and end dates
