@@ -198,27 +198,25 @@ public class SectionController {
         }
         return dto_list;
     }
-	
+
     @GetMapping("/sections/open")
     public List<SectionDTO> getOpenSectionsForEnrollment() {
-
         List<Section> sections = sectionRepository.findByOpenOrderByCourseIdSectionId();
-
         List<SectionDTO> dlist = new ArrayList<>();
         for (Section s : sections) {
             User instructor = userRepository.findByEmail(s.getInstructorEmail());
-            dlist.add( new SectionDTO(
+            dlist.add(new SectionDTO(
                     s.getSectionNo(),
                     s.getTerm().getYear(),
                     s.getTerm().getSemester(),
                     s.getCourse().getCourseId(),
-		            s.getCourse().getTitle(),
+                    s.getCourse().getTitle(),
                     s.getSecId(),
                     s.getBuilding(),
                     s.getRoom(),
                     s.getTimes(),
-                    (instructor!=null) ? instructor.getName() : "",
-                    (instructor!=null) ? instructor.getEmail() : ""
+                    (instructor != null) ? instructor.getName() : "",
+                    (instructor != null) ? instructor.getEmail() : ""
             ));
         }
         return dlist;
