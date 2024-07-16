@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentRepository;
+import com.cst438.domain.Section;
+import com.cst438.domain.SectionRepository;
 import com.cst438.dto.EnrollmentDTO;
 
 @RestController
@@ -24,15 +26,22 @@ public class EnrollmentController {
     @Autowired
     EnrollmentRepository enrollmentRepository;
 
+    @Autowired
+    SectionRepository sectionRepository;
+
     // instructor downloads student enrollments for a section, ordered by student name
     // user must be instructor for the section
     @GetMapping("/sections/{sectionNo}/enrollments")
     public List<EnrollmentDTO> getEnrollments(
             @PathVariable("sectionNo") int sectionNo ) {
 
-        List<Enrollment> enrollments = enrollmentRepository.findEnrollmentsBySectionNoOrderByStudentName(sectionNo);
-        if (sectionNo < 1) {
+        Section theSec = sectionRepository.findById(sectionNo).orElse(null);
+        if (theSec == null) {
             throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "Section not found "+sectionNo);
+        }
+        List<Enrollment> enrollments = enrollmentRepository.findEnrollmentsBySectionNoOrderByStudentName(sectionNo);
+        if (enrollments.size() < 1) {
+            throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "Nobody has enrolled in section "+sectionNo);
         } else {
             List<EnrollmentDTO> dto_list = new ArrayList<>();
             for (Enrollment e : enrollments) {
