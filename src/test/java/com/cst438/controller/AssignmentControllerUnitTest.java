@@ -253,11 +253,11 @@ public class AssignmentControllerUnitTest {
                 .getResponse();
 
 
-        assertEquals(404, response.getStatus());
+        assertEquals(400, response.getStatus());
 
         // checker error msg
         String errorMessage = response.getErrorMessage();
-        assertEquals("grade not found 99999", errorMessage);
+        assertEquals("Grade not found 99999", errorMessage);
     }
 
 

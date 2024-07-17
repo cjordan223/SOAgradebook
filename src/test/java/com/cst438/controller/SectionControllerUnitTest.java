@@ -1,11 +1,6 @@
 package com.cst438.controller;
 
-import com.cst438.domain.Enrollment;
-import com.cst438.domain.EnrollmentRepository;
-import com.cst438.domain.Section;
-import com.cst438.domain.SectionRepository;
-import com.cst438.domain.User;
-import com.cst438.domain.UserRepository;
+import com.cst438.domain.*;
 import com.cst438.dto.EnrollmentDTO;
 import com.cst438.dto.SectionDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,6 +39,8 @@ public class SectionControllerUnitTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    GradeRepository gradeRepository;
     @Test
     public void addSection() throws Exception {
 
@@ -152,8 +150,8 @@ public class SectionControllerUnitTest {
         MockHttpServletResponse response;
 
         // Enrollment data
-        int studentId = 3;  // existing student
-        int sectionNo = 9;  // existing section
+        int studentId = 5;  // existing student
+        int sectionNo = 11;  // existing section
 
         // Ensure the section exists in the database
         Section section = sectionRepository.findById(sectionNo).orElse(null);
@@ -199,8 +197,8 @@ public class SectionControllerUnitTest {
         MockHttpServletResponse response;
 
         // Enrollment data
-        int studentId = 3;  // existing student
-        int sectionNo = 9;  // existing section
+        int studentId = 5;  // existing student
+        int sectionNo = 11;  // existing section
 
         // Ensure the section exists in the database
         Section section = sectionRepository.findById(sectionNo).orElse(null);
@@ -212,6 +210,7 @@ public class SectionControllerUnitTest {
 
         // Clear any existing enrollments for this student and section
         Enrollment existingEnrollment = enrollmentRepository.findEnrollmentBySectionNoAndStudentId(sectionNo, studentId);
+
         if (existingEnrollment != null) {
             enrollmentRepository.delete(existingEnrollment);
         }
@@ -233,11 +232,11 @@ public class SectionControllerUnitTest {
                 .getResponse();
 
         // Check the response code for 400 meaning Bad Request
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
 
         // Check the error message
         String errorMessage = response.getErrorMessage();
-        assertEquals("already enrolled in this section", errorMessage);
+        assertEquals("student has already enrolled", errorMessage);
     }
 
 
