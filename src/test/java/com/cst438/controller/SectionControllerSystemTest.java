@@ -77,7 +77,7 @@ public class SectionControllerSystemTest {
 
 
         // click link to navigate to Sections
-        WebElement we = driver.findElement(By.id("sections"));
+        WebElement we = driver.findElement(By.xpath("//a[@href='/sections']"));
         we.click();
         Thread.sleep(SLEEP_DURATION);
 
@@ -173,7 +173,7 @@ public class SectionControllerSystemTest {
         // delete the section
 
        // click link to navigate to Sections
-       WebElement we = driver.findElement(By.id("sections"));
+       WebElement we = driver.findElement(By.xpath("//a[@href='/sections']"));
        we.click();
        Thread.sleep(SLEEP_DURATION);
 
