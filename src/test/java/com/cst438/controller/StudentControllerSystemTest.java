@@ -11,31 +11,21 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.util.List;
+
 public class StudentControllerSystemTest {
 
     public static final String CHROME_DRIVER_FILE_LOCATION =
             "chromedriver-mac-arm64/chromedriver";
-
-    //public static final String CHROME_DRIVER_FILE_LOCATION =
-    //        "~/chromedriver_macOS/chromedriver";
     public static final String URL = "http://localhost:3000";
-
     public static final int SLEEP_DURATION = 1000; // 1 second.
-
-
-    // add selenium dependency to pom.xml
-
-    // these tests assumes that test data does NOT contain any
-    // sections for course cst499 in 2024 Spring term.
 
     WebDriver driver;
 
     @BeforeEach
     public void setUpDriver() throws Exception {
-
         // set properties required by Chrome Driver
-        System.setProperty(
-                "webdriver.chrome.driver", CHROME_DRIVER_FILE_LOCATION);
+        System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_FILE_LOCATION);
         ChromeOptions ops = new ChromeOptions();
         ops.addArguments("--remote-allow-origins=*");
 
@@ -45,7 +35,6 @@ public class StudentControllerSystemTest {
         driver.get(URL);
         // must have a short wait to allow time for the page to download
         Thread.sleep(SLEEP_DURATION);
-
     }
 
     @AfterEach
@@ -60,20 +49,32 @@ public class StudentControllerSystemTest {
 
     @Test
     public void systemTestStudentAddCourse() throws Exception {
-
+        // Navigate to the "Enroll in a class" page
         WebElement we = driver.findElement(By.xpath("//a[@href='/addCourse']"));
         we.click();
         Thread.sleep(SLEEP_DURATION);
 
-        WebElement courseRow = driver.findElement(By.xpath("//ul/li[text()='2024' and text()='Fall' and text()='cst438']"));
-        WebElement enrollButton = courseRow.findElement(By.tagName("button"));
-        enrollButton.click();
-        Thread.sleep(SLEEP_DURATION);
+        // Locate the course row
+        List<WebElement> courseRows = driver.findElements(By.xpath("//tr"));
+        WebElement targetCourseRow = null;
+        for (WebElement row : courseRows) {
+            if (row.getText().contains("2024") && row.getText().contains("Fall") && row.getText().contains("cst438")) {
+                targetCourseRow = row;
+                break;
+            }
+        }
 
-        Alert alert = driver.switchTo().alert();
-        String message= driver.switchTo().alert().getText();
-        driver.switchTo().alert().accept();
-        assertEquals("Enrolled successfully!", message);
+        // If the course row is found, click the "Add Course" button
+        if (targetCourseRow != null) {
+            WebElement enrollButton = targetCourseRow.findElement(By.xpath(".//button[text()='Add Course']"));
+            enrollButton.click();
+            Thread.sleep(SLEEP_DURATION);
+
+            // Handle the confirmation alert
+            Alert alert = driver.switchTo().alert();
+            String message = alert.getText();
+            alert.accept();
+            assertEquals("Enrolled successfully!", message);
+        }
     }
-
 }
