@@ -14,7 +14,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class StudentControllerSystemTest {
 
     public static final String CHROME_DRIVER_FILE_LOCATION =
-            "chromedriver-win64/chromedriver.exe";
+            "chromedriver-mac-arm64/chromedriver";
 
     //public static final String CHROME_DRIVER_FILE_LOCATION =
     //        "~/chromedriver_macOS/chromedriver";
