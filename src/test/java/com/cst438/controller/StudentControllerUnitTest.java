@@ -163,7 +163,7 @@ public class StudentControllerUnitTest {
         // issue the POST request
         response = mvc.perform(
                         MockMvcRequestBuilders
-                                .post("/enrollments/sections/11?studentId=3")
+                                .post("/enrollments/sections/20?studentId=3")
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
