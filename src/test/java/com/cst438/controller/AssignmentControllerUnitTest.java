@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.cst438.domain.*;
-import com.cst438.dto.AssignmentDTO;
-import com.cst438.dto.CourseDTO;
+import com.cst438.dto.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import net.bytebuddy.asm.Advice;
 import org.aspectj.lang.annotation.Before;
 import org.checkerframework.checker.units.qual.A;
@@ -21,10 +21,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import com.cst438.dto.SectionDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -35,6 +36,12 @@ public class AssignmentControllerUnitTest {
 
     @Autowired
     AssignmentRepository assignmentRepository;
+
+    @Autowired
+    GradeRepository gradeRepository;
+
+    @Autowired
+    EnrollmentRepository enrollmentRepository;
 
     static final LocalDate today = LocalDate.now();
 
@@ -54,7 +61,7 @@ public class AssignmentControllerUnitTest {
     public void setupData() throws Exception {
         term = termRepository.findByYearAndSemester(2024,"Fall");
         course = courseRepository.findById("cst438").get();
-        section = sectionRepository.findBySectionNo(11);
+        section = sectionRepository.findByLikeCourseIdAndYearAndSemester("cst438", 2024, "Fall").get(0);
     }
 
 
@@ -108,7 +115,7 @@ public class AssignmentControllerUnitTest {
 
     @Test
     public void itShouldNotInsertInvalidDueDate() throws Exception {
-        String dueDate = "2025-09-01";
+        String dueDate = "3024-09-01";
 
         AssignmentDTO assignmentDTO = new AssignmentDTO(
                 123,
@@ -160,17 +167,101 @@ public class AssignmentControllerUnitTest {
         assertEquals(message, "Section not found", "Message should match");
     }
 
+    @Test
     public void itShouldGradeOneAssignment() throws Exception {
+        Grade grade = gradeRepository.findByEnrollmentIdAndAssignmentId(4, 4);
 
+        Integer score = 90;
+
+        List<GradeDTO> gradeDTOList = new ArrayList<>();
+
+        GradeDTO gradeDTO = new GradeDTO(
+                grade.getGradeId(),
+                grade.getEnrollment().getStudent().getName(),
+                grade.getEnrollment().getStudent().getEmail(),
+                grade.getAssignment().getTitle(),
+                grade.getAssignment().getSection().getCourse().getCourseId(),
+                grade.getAssignment().getSection().getSecId(),
+                score
+        );
+
+        gradeDTOList.add(gradeDTO);
+
+        MockHttpServletResponse gradeResponse = mvc.perform(
+                        MockMvcRequestBuilders
+                                .put("/grades")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(gradeDTOList)))
+                .andReturn()
+                .getResponse();
+
+        assertEquals(200, gradeResponse.getStatus(), "Status should be OK");
+
+        String message = gradeResponse.getErrorMessage();
+        assertEquals(message, null, "Message should match");
+
+        MockHttpServletResponse getResult = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get("/assignments/" + grade.getAssignment().getAssignmentId() + "/grades")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        assertEquals(200, getResult.getStatus(), "Status should be OK");
+
+        message = getResult.getErrorMessage();
+        assertEquals(message, null, "Message should be null");
+
+        String jsonResponse = getResult.getContentAsString();
+        // Convert JSON to List<GradeDTO>
+        List<GradeDTO> resultList = new ObjectMapper().readValue(jsonResponse, new TypeReference<List<GradeDTO>>() {});
+
+        // primary key should have a non-zero value from the database
+        assertNotEquals(0, resultList.get(0).gradeId());
+
+        // Check if score was updated
+        assertEquals(score, resultList.get(0).score(), "Score should be 90");
+
+        // Revert score back to null
+        grade.setScore(null);
+        gradeRepository.save(grade);
+
+        Grade g = gradeRepository.findById(grade.getGradeId()).orElse(null);
+
+        // Check grade was set back to null
+        assertNull(g.getScore());
     }
 
-    public void itShouldGradeMoreThanOneAssignment() throws Exception {
+    @Test
+    public void gradeAssignmentInvalidId() throws Exception {
 
+        MockHttpServletResponse response;
+
+        // invalid assignment ID
+        String gradeData = "[{\"gradeId\": 99999, \"score\": 90}]";
+
+        // PUT request to update grades
+        response = mvc.perform(
+                        MockMvcRequestBuilders
+                                .put("/grades")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(gradeData))
+                .andReturn()
+                .getResponse();
+
+
+        assertEquals(404, response.getStatus());
+
+        // checker error msg
+        String errorMessage = response.getErrorMessage();
+        assertEquals("grade not found 99999", errorMessage);
     }
 
-    public void itShouldNotGradeInvalidAssignmentId() throws Exception {
 
-    }
+
 
     private static String asJsonString(final Object obj) {
         try {

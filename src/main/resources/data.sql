@@ -49,4 +49,6 @@ insert into assignment (assignment_id, section_no, title, due_date) values
 (4, 11, 'db homework 2 - current', '2024-09-30');
 
 insert into grade (grade_id, enrollment_id, assignment_id, score) values
-( 1, 2, 1, 95);
+( 1, 2, 1, 95),
+(2, 4, 4, null),
+(3, 4, 3, null);

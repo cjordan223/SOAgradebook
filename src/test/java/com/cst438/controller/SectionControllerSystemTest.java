@@ -157,7 +157,47 @@ public class SectionControllerSystemTest {
                 driver.findElement(By.xpath("//tr[td='cst499']")));
 
     }
+    @Test
+    public void systemTestInstructorGradesAssignment() throws Exception {
+        // Enter year and semester
+        driver.findElement(By.id("year")).sendKeys("2024");
+        driver.findElement(By.id("semester")).sendKeys("Spring");
+        driver.findElement(By.linkText("Show Sections")).click();
+        Thread.sleep(SLEEP_DURATION);
 
+        // Click on the "Assignments" link for the relevant section
+        WebElement assignmentsLink = driver.findElement(By.linkText("Assignments"));
+        assignmentsLink.click();
+        Thread.sleep(SLEEP_DURATION);
+
+        // Locate the assignment to grade
+        WebElement assignmentRow = driver.findElement(By.xpath("//tr[td[contains(text(),'db homework 1')]]"));
+        List<WebElement> buttons = assignmentRow.findElements(By.tagName("button"));
+        // Click the "Grade" button
+        buttons.get(0).click();  // assuming the "Grade" button is the first button
+        Thread.sleep(SLEEP_DURATION);
+
+         Thread.sleep(SLEEP_DURATION);
+
+        // Enter grades for all students
+        List<WebElement> gradeInputs = driver.findElements(By.name("score"));
+        for (WebElement gradeInput : gradeInputs) {
+            gradeInput.clear();
+            gradeInput.sendKeys("90"); // example grade
+        }
+        Thread.sleep(SLEEP_DURATION);
+
+
+        driver.findElement(By.xpath("//button[contains(text(),'Save')]")).click();
+        Thread.sleep(SLEEP_DURATION);
+
+
+        String message = driver.findElement(By.xpath("//h4[contains(text(),'Grades saved')]")).getText();
+        assertTrue(message.startsWith("Grades saved"));
+
+
+        driver.findElement(By.xpath("//button[contains(text(),'Close')]")).click();
+    }
     @Test
     public void systemTestAddSectionBadCourse() throws Exception {
         // attempt to add a section to course cst599 2024, Spring

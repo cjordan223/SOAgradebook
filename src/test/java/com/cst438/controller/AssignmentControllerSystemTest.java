@@ -9,6 +9,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,9 +51,33 @@ public class AssignmentControllerSystemTest {
     @Test
     public void systemTestAddAssignment() throws Exception {
 
-        // click link to navigate to Sections
-        WebElement we = driver.findElement(By.id("assignments"));
-        we.click();
+        // Verify the section is found in the list and click into assignments
+        // Section should be in list because it exists in data.sql
+        // And instructor cannot delete
+        driver.findElement(By.id("year")).sendKeys("2024");
+        driver.findElement(By.id("semester")).sendKeys("Fall");
+        driver.findElement(By.linkText("Show Sections")).click();
         Thread.sleep(SLEEP_DURATION);
+
+        // Click on the "Assignments" link for the relevant section
+        WebElement assignmentsLink = driver.findElement(By.linkText("Assignments"));
+        assignmentsLink.click();
+        Thread.sleep(SLEEP_DURATION);
+
+        // Click to add Assignment
+        driver.findElement(By.xpath("//*[@id=\"root\"]/div/div/button")).click();
+        Thread.sleep(SLEEP_DURATION);
+
+        // Enter in assignment values
+        driver.findElement(By.name("title")).sendKeys("Testing Assignment");
+        driver.findElement(By.name("dueDate")).sendKeys("2024-09-01");
+        driver.findElement(By.xpath("//button[contains(text(), 'Save')]")).click();
+        Thread.sleep(SLEEP_DURATION);
+
+        // Check if message shows assignment created
+        WebElement msg = driver.findElement(By.tagName("h3"));
+        String message = msg.getText();
+
+        assertTrue(message.contains("Assignment created"));
     }
 }
