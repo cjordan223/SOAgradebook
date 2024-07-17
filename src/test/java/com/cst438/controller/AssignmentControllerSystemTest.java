@@ -58,7 +58,7 @@ public class AssignmentControllerSystemTest {
             Thread.sleep(SLEEP_DURATION);
 
             // Click to add Assignment
-            driver.findElement(By.xpath("//button[contains(@class, 'add-assignment-button')]")).click();
+            driver.findElement(By.xpath("/html/body/div/div/div/button")).click();
             Thread.sleep(SLEEP_DURATION);
 
             // Enter in assignment values
@@ -68,7 +68,7 @@ public class AssignmentControllerSystemTest {
             Thread.sleep(SLEEP_DURATION);
 
             // Check if message shows assignment created
-            WebElement msg = driver.findElement(By.tagName("h4"));
+            WebElement msg = driver.findElement(By.tagName("h3"));
             String message = msg.getText();
             System.out.println("Message displayed: " + message); // Debug log
 

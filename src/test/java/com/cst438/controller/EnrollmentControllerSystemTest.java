@@ -14,7 +14,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class EnrollmentControllerSystemTest {
 
     public static final String CHROME_DRIVER_FILE_LOCATION =
-            "chromedriver-win64/chromedriver.exe";
+            "chromedriver-mac-arm64/chromedriver";
 
     //public static final String CHROME_DRIVER_FILE_LOCATION =
     //        "~/chromedriver_macOS/chromedriver";
@@ -60,24 +60,25 @@ public class EnrollmentControllerSystemTest {
 
     @Test
     public void systemTestInstructorModifyGrade() throws Exception {
+
         driver.findElement(By.id("year")).sendKeys("2024");
         driver.findElement(By.id("semester")).sendKeys("Spring");
         Thread.sleep(SLEEP_DURATION);
         driver.findElement(By.xpath("//a[@href='/sections']")).click();
-        
+
         WebElement courseRow = driver.findElement(By.xpath("//tr[td='8']"));
         WebElement enrollments = courseRow.findElement(By.xpath("//a[@href='/enrollments']"));
         enrollments.click();
 
         WebElement enrollmentRow = driver.findElement(By.xpath("//tr[td='thomas edison']"));
         WebElement gradeBox = enrollmentRow.findElement(By.tagName("input"));
-        gradeBox.sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
+        gradeBox.clear();
         Thread.sleep(SLEEP_DURATION);
+
         gradeBox.sendKeys("F");
-        driver.findElement(By.linkText("SAVE GRADES")).click();
+        driver.findElement(By.tagName("Button")).click();
         Thread.sleep(SLEEP_DURATION);
-        String message = driver.findElement(By.xpath("//h3[text()='Grades saved successfully']")).getText();
-        assertEquals("Grades saved successfully", message);
+        String message = driver.findElement(By.xpath("//h3[text()='Grades saved']")).getText();
+        assertEquals("Grades saved", message);
     }
-    
 }
