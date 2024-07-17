@@ -1,5 +1,7 @@
 package com.cst438.controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -142,14 +144,29 @@ public class StudentController {
         if (en.size() > 0) {
             throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "student has already enrolled");
         }
-        Boolean valid = false;
-        List<Section> validSections = sectionRepository.findByOpenOrderByCourseIdSectionId();
-        for (Section s : validSections) {
-            if (s.getSectionNo() == sectionNo) {
-                valid = true;
-            }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date currDate = new Date();
+        String currDateStr = dateFormat.format(currDate);
+        Date enrollDeadDate = section.getTerm().getAddDeadline();
+        String enrollDDateStr = enrollDeadDate.toString();
+        Integer currYear = Integer.valueOf(currDateStr.substring(0, 4));
+        Integer currMonth = Integer.valueOf(currDateStr.substring(5, 7));
+        Integer currDay = Integer.valueOf(currDateStr.substring(8, 10));
+        Integer dueYear = Integer.valueOf(enrollDDateStr.substring(0, 4));
+        Integer dueMonth = Integer.valueOf(enrollDDateStr.substring(5, 7));
+        Integer dueDay = Integer.valueOf(enrollDDateStr.substring(8, 10));
+        boolean dateValid = true;
+        System.out.println(dueYear+" "+dueMonth+" "+dueDay);
+        if (currYear > dueYear) {
+            dateValid = false;
         }
-        if (valid == false) {
+        else if ((currYear-dueYear == 0) && (currMonth > dueMonth)) {
+            dateValid = false;
+        }
+        else if ((currYear-dueYear == 0) && (currMonth-dueMonth == 0) && (currDay > dueDay)) {
+            dateValid = false;
+        }
+        if (!dateValid) {
             throw  new ResponseStatusException( HttpStatus.NOT_FOUND, "the enrollment date is not valid");
         }
 
