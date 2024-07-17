@@ -162,7 +162,9 @@ public class StudentControllerUnitTest {
         // issue the POST request to a non-existent section (e.g., section ID 12)
         response = mvc.perform(
                         MockMvcRequestBuilders
-                                .post("/enrollments/sections/12?studentId=3")
+
+                                .post("/enrollments/sections/20?studentId=3")
+
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
