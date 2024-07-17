@@ -65,7 +65,7 @@ public class StudentControllerSystemTest {
         we.click();
         Thread.sleep(SLEEP_DURATION);
 
-        WebElement courseRow = driver.findElement(By.xpath("//ul/li[text()='2024' and text()='Fall' and text()='cst499']"));
+        WebElement courseRow = driver.findElement(By.xpath("//ul/li[text()='2024' and text()='Fall' and text()='cst438']"));
         WebElement enrollButton = courseRow.findElement(By.tagName("button"));
         enrollButton.click();
         Thread.sleep(SLEEP_DURATION);
