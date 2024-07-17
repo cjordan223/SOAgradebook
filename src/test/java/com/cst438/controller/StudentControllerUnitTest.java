@@ -157,13 +157,14 @@ public class StudentControllerUnitTest {
 
     @Test
     public void addCourseFailsBadSection() throws Exception {
-
         MockHttpServletResponse response;
 
-        // issue the POST request
+        // issue the POST request to a non-existent section (e.g., section ID 12)
         response = mvc.perform(
                         MockMvcRequestBuilders
+
                                 .post("/enrollments/sections/20?studentId=3")
+
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -174,8 +175,8 @@ public class StudentControllerUnitTest {
         // check the expected error message
         String message = response.getErrorMessage();
         assertEquals("section is not found", message);
-
     }
+
 
     @Test
     public void addCourseFailsBadDate() throws Exception {
