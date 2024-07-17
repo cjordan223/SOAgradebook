@@ -20,7 +20,7 @@ public interface SectionRepository extends CrudRepository<Section, Integer> {
     @Query("select s from Section s where s.secId=:secId")
     List<Section> findBySectionId(int secId);
 
-//     @Query("select s from Section s where s.sectionNo=:sectionNo")
-//     Section findBySectionNo(int sectionNo);
+     @Query("select s from Section s where s.sectionNo=:sectionNo")
+     Section findBySectionNo(int sectionNo);
 
 }

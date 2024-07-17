@@ -173,7 +173,7 @@ public class AssignmentController {
     public void updateGrades(@RequestBody List<GradeDTO> dlist) {
         for (GradeDTO dto : dlist) {
             Grade grade = gradeRepository.findById(dto.gradeId()).orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grade not found"));
+                    new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grade not found " + dto.gradeId()));
             grade.setScore(dto.score());
             gradeRepository.save(grade);
         }
