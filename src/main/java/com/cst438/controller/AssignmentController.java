@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cst438.domain.*;
+import com.cst438.dto.SectionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,14 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.cst438.domain.Assignment;
-import com.cst438.domain.AssignmentRepository;
-import com.cst438.domain.Enrollment;
-import com.cst438.domain.EnrollmentRepository;
-import com.cst438.domain.Grade;
-import com.cst438.domain.GradeRepository;
-import com.cst438.domain.Section;
-import com.cst438.domain.SectionRepository;
 import com.cst438.dto.AssignmentDTO;
 import com.cst438.dto.AssignmentStudentDTO;
 import com.cst438.dto.GradeDTO;
@@ -44,6 +38,9 @@ public class AssignmentController {
 
     @Autowired
     GradeRepository gradeRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @GetMapping("/sections/{secNo}/assignments")
     public List<AssignmentDTO> getAssignments(@PathVariable("secNo") int secNo) {
@@ -197,5 +194,38 @@ public class AssignmentController {
                     a.getSection().getCourse().getCourseId(), a.getSection().getSecId(), score));
         }
         return assignmentStudentDTOs;
+    }
+
+    // get Sections for an instructor
+    @GetMapping("/sections")
+    public List<SectionDTO> getSectionsForInstructor(
+            @RequestParam("email") String instructorEmail,
+            @RequestParam("year") int year ,
+            @RequestParam("semester") String semester )  {
+
+
+        List<Section> sections = sectionRepository.findByInstructorEmailAndYearAndSemester(instructorEmail, year, semester);
+
+        List<SectionDTO> dto_list = new ArrayList<>();
+        for (Section s : sections) {
+            User instructor = null;
+            if (s.getInstructorEmail()!=null) {
+                instructor = userRepository.findByEmail(s.getInstructorEmail());
+            }
+            dto_list.add(new SectionDTO(
+                    s.getSectionNo(),
+                    s.getTerm().getYear(),
+                    s.getTerm().getSemester(),
+                    s.getCourse().getCourseId(),
+                    s.getCourse().getTitle(),
+                    s.getSecId(),
+                    s.getBuilding(),
+                    s.getRoom(),
+                    s.getTimes(),
+                    (instructor!=null) ? instructor.getName() : "",
+                    (instructor!=null) ? instructor.getEmail() : ""
+            ));
+        }
+        return dto_list;
     }
 }
